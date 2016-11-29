@@ -72,7 +72,8 @@ importall .Checked
 
 # Symbol constructors
 if !isdefined(Core, :Inference)
-    Symbol(s::String) = Symbol(s.data)
+    Symbol(s::String) =
+        ccall(:jl_symbol_n, Ref{Symbol}, (Ptr{UInt8}, Int32), s, s.len)
     Symbol(a::Array{UInt8,1}) =
         ccall(:jl_symbol_n, Ref{Symbol}, (Ptr{UInt8}, Int32), a, length(a))
 end
@@ -122,6 +123,9 @@ using .MultiplicativeInverses
 include("abstractarraymath.jl")
 include("arraymath.jl")
 
+include("char.jl")
+include("strings/string.jl")
+
 # SIMD loops
 include("simdloop.jl")
 importall .SimdLoop
@@ -148,8 +152,9 @@ typealias StridedMatrix{T,A<:Union{DenseArray,StridedReshapedArray},I<:Tuple{Var
 typealias StridedVecOrMat{T} Union{StridedVector{T}, StridedMatrix{T}}
 
 # For OS specific stuff
-include(String(vcat(length(Core.ARGS)>=2?Core.ARGS[2].data:"".data, "build_h.jl".data))) # include($BUILDROOT/base/build_h.jl)
-include(String(vcat(length(Core.ARGS)>=2?Core.ARGS[2].data:"".data, "version_git.jl".data))) # include($BUILDROOT/base/version_git.jl)
+include(string((length(Core.ARGS)>=2 ? Core.ARGS[2] : ""), "build_h.jl"))     # include($BUILDROOT/base/build_h.jl)
+include(string((length(Core.ARGS)>=2 ? Core.ARGS[2] : ""), "version_git.jl")) # include($BUILDROOT/base/version_git.jl)
+
 include("osutils.jl")
 include("c.jl")
 include("sysinfo.jl")
@@ -165,7 +170,6 @@ include("iostream.jl")
 include("iobuffer.jl")
 
 # strings & printing
-include("char.jl")
 include("intfuncs.jl")
 include("strings/strings.jl")
 include("parse.jl")

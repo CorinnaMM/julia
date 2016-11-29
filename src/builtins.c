@@ -1339,7 +1339,9 @@ static size_t jl_static_show_x_(JL_STREAM *out, jl_value_t *v, jl_datatype_t *vt
         n += jl_printf(out, "nothing");
     }
     else if (vt == jl_string_type) {
-        n += jl_printf(out, "\"%s\"", jl_iostr_data(v));
+        n += jl_printf(out, "\"");
+        jl_uv_puts(out, jl_string_data(v), jl_string_len(v)); n += jl_string_len(v);
+        n += jl_printf(out, "\"");
     }
     else if (vt == jl_uniontype_type) {
         n += jl_show_svec(out, ((jl_uniontype_t*)v)->types, "Union", "{", "}");

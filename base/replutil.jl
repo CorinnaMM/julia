@@ -147,7 +147,7 @@ function show(io::IO, ::MIME"text/plain", s::String)
         show(io, s)
     else
         println(io, sizeof(s), "-byte String of invalid UTF-8 data:")
-        showarray(io, s.data, false; header=false)
+        showarray(io, convert(Vector{UInt8},s), false; header=false)
     end
 end
 

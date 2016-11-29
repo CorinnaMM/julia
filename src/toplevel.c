@@ -669,11 +669,12 @@ JL_DLLEXPORT jl_value_t *jl_load(const char *fname)
 // load from filename given as a String object
 JL_DLLEXPORT jl_value_t *jl_load_(jl_value_t *str)
 {
-    jl_array_t *ary =
-        jl_array_cconvert_cstring((jl_array_t*)(jl_data_ptr(str)[0]));
-    JL_GC_PUSH1(&ary);
-    jl_value_t *res = jl_load((const char*)ary->data);
-    JL_GC_POP();
+    size_t n = jl_string_len(str);
+    char *name = (char*)malloc(n + 1);
+    memcpy(name, jl_string_data(str), n);
+    name[n] = '\0';
+    jl_value_t *res = jl_load((const char*)name);
+    free(name);
     return res;
 }
 
