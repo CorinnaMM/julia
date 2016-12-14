@@ -50,6 +50,9 @@ This section lists changes that do not have deprecation warnings.
   * `broadcast` now treats `Ref` (except for `Ptr`) arguments as 0-dimensional
     arrays ([#18965]).
 
+  * `@async`, `@spawn`, `@spawnat`, `@fetch`, `@fetchfrom` and `@parallel` no longer localize
+    expression variables.
+
 Library improvements
 --------------------
 

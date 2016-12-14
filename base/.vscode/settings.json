@@ -1,0 +1,11 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+		"files.trimTrailingWhitespace": true,
+	    "editor.insertSpaces": true,
+		"editor.tabSize": 4,
+		"julia.validate.executablePath" : "/Applications/Julia-0.5.app/Contents/Resources/julia/bin/julia",
+		"julia.validate.run": "onSave",
+		"window.openFilesInNewWindow": false,
+		"editor.stablePeek": true,
+		"LastEntry":true
+}
