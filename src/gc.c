@@ -542,7 +542,8 @@ static inline int gc_setmark(jl_ptls_t ptls, jl_value_t *v, int sz)
 
 inline void gc_setmark_buf(jl_ptls_t ptls, void *o, int mark_mode, size_t minsz)
 {
-    jl_taggedvalue_t *buf = jl_astaggedvalue(o);
+    jl_taggedvalue_t *buf = jl_astaggedvalue(jl_buf_to_obj_ptr(o));
+    minsz += sizeof(size_t);
     // If the object is larger than the max pool size it can't be a pool object.
     // This should be accurate most of the time but there might be corner cases
     // where the size estimate is a little off so we do a pool lookup to make
@@ -1170,7 +1171,7 @@ JL_DLLEXPORT void jl_gc_queue_root(jl_value_t *ptr)
 void gc_queue_binding(jl_binding_t *bnd)
 {
     jl_ptls_t ptls = jl_get_ptls_states();
-    jl_taggedvalue_t *buf = jl_astaggedvalue(bnd);
+    jl_taggedvalue_t *buf = jl_astaggedvalue(jl_buf_to_obj_ptr(bnd));
 #ifndef JULIA_ENABLE_THREADING
     // Will fail for multithreading. See `jl_gc_queue_root`
     assert(buf->bits.gc == GC_OLD_MARKED);
@@ -1716,8 +1717,8 @@ static void _jl_gc_collect(jl_ptls_t ptls, int full)
             jl_astaggedvalue(item)->bits.gc = GC_OLD_MARKED;
         }
         for (int i = 0; i < ptls2->heap.rem_bindings.len; i++) {
-            void *ptr = ptls2->heap.rem_bindings.items[i];
-            jl_astaggedvalue(ptr)->bits.gc = GC_OLD_MARKED;
+            void *bnd = ptls2->heap.rem_bindings.items[i];
+            jl_astaggedvalue(jl_buf_to_obj_ptr(bnd))->bits.gc = GC_OLD_MARKED;
         }
     }
 
@@ -1848,8 +1849,8 @@ static void _jl_gc_collect(jl_ptls_t ptls, int full)
                 jl_astaggedvalue(ptls2->heap.remset->items[i])->bits.gc = GC_MARKED;
             }
             for (int i = 0; i < ptls2->heap.rem_bindings.len; i++) {
-                void *ptr = ptls2->heap.rem_bindings.items[i];
-                jl_astaggedvalue(ptr)->bits.gc = GC_MARKED;
+                void *bnd = ptls2->heap.rem_bindings.items[i];
+                jl_astaggedvalue(jl_buf_to_obj_ptr(bnd))->bits.gc = GC_MARKED;
             }
         }
         else {

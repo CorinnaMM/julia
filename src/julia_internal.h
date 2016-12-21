@@ -184,10 +184,13 @@ JL_DLLEXPORT jl_value_t *jl_gc_alloc(jl_ptls_t ptls, size_t sz, void *ty);
 #  define jl_gc_alloc(ptls, sz, ty) jl_gc_alloc_(ptls, sz, ty)
 #endif
 
+#define jl_buf_to_obj_ptr(buf) ((void*)((void**)buf-1))
+
 #define jl_buff_tag ((uintptr_t)0x4eade800)
 STATIC_INLINE void *jl_gc_alloc_buf(jl_ptls_t ptls, size_t sz)
 {
-    return jl_gc_alloc(ptls, sz, (void*)jl_buff_tag);
+    void **buf = (void**)jl_gc_alloc(ptls, sz + sizeof(void*), (void*)jl_buff_tag);
+    return (void*)(buf + 1);
 }
 
 jl_code_info_t *jl_type_infer(jl_method_instance_t *li, int force);
@@ -264,7 +267,7 @@ void gc_setmark_buf(jl_ptls_t ptls, void *buf, int, size_t);
 
 STATIC_INLINE void jl_gc_wb_binding(jl_binding_t *bnd, void *val) // val isa jl_value_t*
 {
-    if (__unlikely(jl_astaggedvalue(bnd)->bits.gc == 3 &&
+    if (__unlikely(jl_astaggedvalue(jl_buf_to_obj_ptr(bnd))->bits.gc == 3 &&
                    (jl_astaggedvalue(val)->bits.gc & 1) == 0))
         gc_queue_binding(bnd);
 }
