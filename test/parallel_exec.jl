@@ -1250,7 +1250,7 @@ function test_add_procs_threaded_blas()
     for thread_count in thread_counts_by_process
         @test thread_count == 1
     end
-    rmprocs(processes_added)
+    @test :ok == rmprocs(processes_added; waitfor=10.0)
 
     processes_added = addprocs(2, enable_threaded_blas=true)
     for proc_id in processes_added
@@ -1266,7 +1266,7 @@ function test_add_procs_threaded_blas()
     for thread_count in thread_counts_by_process
         @test thread_count >= 1
     end
-    rmprocs(processes_added)
+    @test :ok == rmprocs(processes_added; waitfor=10.0)
 end
 test_add_procs_threaded_blas()
 
